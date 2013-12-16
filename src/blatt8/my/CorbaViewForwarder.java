@@ -31,7 +31,7 @@ public final class CorbaViewForwarder implements IForumView {
 		for(Map.Entry<String, Position> entry : arg0.entrySet())
 			result.add(new PositionedAvatar(entry.getKey(), new blatt8.genserver.Position( entry.getValue().getX() , entry.getValue().getY()) ));
 		
-		return (PositionedAvatar[]) result.toArray();
+		return result.toArray(new PositionedAvatar[result.size()]);
 	}
 
 }

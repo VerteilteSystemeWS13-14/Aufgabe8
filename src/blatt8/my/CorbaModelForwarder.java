@@ -7,25 +7,40 @@ import java.rmi.NotBoundException;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAHelper;
+import org.omg.PortableServer.POAPackage.ServantNotActive;
+import org.omg.PortableServer.POAPackage.WrongPolicy;
 
-import blatt8.genserver.CorbaForumModel;
-import blatt8.genserver.CorbaForumModelHelper;
+import blatt8.genclient.CorbaForumModel;
+import blatt8.genclient.CorbaForumModelHelper;
+import blatt8.genclient.CorbaForumView;
+import blatt8.genclient.CorbaForumViewHelper;
 
 import forum.framework.IForumModel;
 import forum.framework.IForumView;
 
 public final class CorbaModelForwarder implements IForumModel {
 	
+	public static final String NAME = "CorbaModelReceiver";
 	private CorbaForumModel receiver;
-	public String[] args;
+	private POA rootpoa;
 	
 	public CorbaModelForwarder()
 	{
-		try {
+		String[] args = new String[2];
+		args[0] = "-ORBInitialPort";
+		args[1] = "1050";
+		
 		ORB orb = ORB.init(args, null);
-		NamingContextExt nameService = NamingContextExtHelper.narrow(
-		orb.resolve_initial_references("NameService"));
-		receiver = CorbaForumModelHelper.narrow(nameService.resolve_str("HelloServer"));
+		
+		try {
+			rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+			rootpoa.the_POAManager().activate(); 
+		
+			NamingContextExt nameService = NamingContextExtHelper.narrow(orb.resolve_initial_references("NameService"));
+
+			receiver = CorbaForumModelHelper.narrow(nameService.resolve_str(NAME));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -36,7 +51,7 @@ public final class CorbaModelForwarder implements IForumModel {
 			IOException {
 		try {
 			receiver.deregisterView(arg0);
-		} catch (blatt8.genserver.NotBoundException e) {
+		} catch (blatt8.genclient.NotBoundException e) {
 			e.printStackTrace();
 		}
 
@@ -46,7 +61,7 @@ public final class CorbaModelForwarder implements IForumModel {
 	public void moveEast(String arg0) throws NotBoundException, IOException {
 		try {
 			receiver.moveEast(arg0);
-		} catch (blatt8.genserver.NotBoundException e) {
+		} catch (blatt8.genclient.NotBoundException e) {
 			e.printStackTrace();
 		}
 
@@ -56,7 +71,7 @@ public final class CorbaModelForwarder implements IForumModel {
 	public void moveNorth(String arg0) throws NotBoundException, IOException {
 		try {
 			receiver.moveNorth(arg0);
-		} catch (blatt8.genserver.NotBoundException e) {
+		} catch (blatt8.genclient.NotBoundException e) {
 			e.printStackTrace();
 		}
 	}
@@ -65,7 +80,7 @@ public final class CorbaModelForwarder implements IForumModel {
 	public void moveSouth(String arg0) throws NotBoundException, IOException {
 		try {
 			receiver.moveSouth(arg0);
-		} catch (blatt8.genserver.NotBoundException e) {
+		} catch (blatt8.genclient.NotBoundException e) {
 			e.printStackTrace();
 		}
 	}
@@ -74,7 +89,7 @@ public final class CorbaModelForwarder implements IForumModel {
 	public void moveWest(String arg0) throws NotBoundException, IOException {
 		try {
 			receiver.moveWest(arg0);
-		} catch (blatt8.genserver.NotBoundException e) {
+		} catch (blatt8.genclient.NotBoundException e) {
 			e.printStackTrace();
 		}
 	}
@@ -82,12 +97,22 @@ public final class CorbaModelForwarder implements IForumModel {
 	@Override
 	public void registerView(String arg0, IForumView arg1)
 			throws AlreadyBoundException, IOException {
+		
+		org.omg.CORBA.Object ref = null;
 		try {
-			receiver.registerView(arg0, new CorbaViewReceiver(arg1));
-		} catch (blatt8.genserver.AlreadyBoundException e) {
+			ref = rootpoa.servant_to_reference(new CorbaViewReceiver(arg1));
+		} catch (ServantNotActive e) {
+			e.printStackTrace();
+		} catch (WrongPolicy e) {
 			e.printStackTrace();
 		}
+		CorbaForumView view = CorbaForumViewHelper.narrow(ref);
 
+		try {
+			receiver.registerView(arg0, view);
+		} catch (blatt8.genclient.AlreadyBoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
