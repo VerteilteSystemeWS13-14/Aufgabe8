@@ -9,9 +9,7 @@ public final class CorbaForumClient {
 	 */
 	public static void main(String[] args) {
 		try {
-			CorbaModelForwarder forwarder = new CorbaModelForwarder();
-			forwarder.args = args;
-			ForumClient client = new ForumClient(new CorbaModelForwarder());
+			ForumClient client = new ForumClient(new CorbaModelForwarder(args));
 			client.register();
 		} catch (Exception e) {
 			e.printStackTrace();

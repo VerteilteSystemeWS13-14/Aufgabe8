@@ -12,10 +12,11 @@ public final class CorbaForumServer {
 		
 		try {
 			server.run();
-			System.out.println("Server up and running.");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		System.out.println("Shutdown Server.");
 		
 		
 	}

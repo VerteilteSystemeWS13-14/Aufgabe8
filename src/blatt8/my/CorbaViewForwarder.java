@@ -1,7 +1,6 @@
 package blatt8.my;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Map;
 
 import blatt8.genserver.CorbaForumView;
@@ -27,11 +26,15 @@ public final class CorbaViewForwarder implements IForumView {
 	
 	private PositionedAvatar[] getArray(Map<String, Position> arg0)
 	{
-		ArrayList<PositionedAvatar> result = new ArrayList<PositionedAvatar>(arg0.size());
+		PositionedAvatar[] result = new PositionedAvatar[arg0.size()];
+		int i = 0;
 		for(Map.Entry<String, Position> entry : arg0.entrySet())
-			result.add(new PositionedAvatar(entry.getKey(), new blatt8.genserver.Position( entry.getValue().getX() , entry.getValue().getY()) ));
+		{
+			result[i] = new PositionedAvatar(entry.getKey(), new blatt8.genserver.Position( entry.getValue().getX() , entry.getValue().getY()) );
+			i++;
+		}
 		
-		return (PositionedAvatar[]) result.toArray();
+		return result;
 	}
 
 }
