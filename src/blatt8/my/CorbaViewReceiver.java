@@ -10,23 +10,12 @@ import forum.framework.IForumView;
 
 public final class CorbaViewReceiver extends CorbaForumViewPOA {
 
-	private static final long serialVersionUID = -1266104063345053576L;
 	private IForumView view;
-	
-	public CorbaViewReceiver(IForumView p_view)
-	{
+
+	public CorbaViewReceiver(IForumView p_view) {
 		view = p_view;
 	}
 	
-	private Map<String, forum.framework.Position> getMap(blatt8.genserver.PositionedAvatar[] folks)
-	{
-		Map<String, forum.framework.Position> result = new HashMap<String, forum.framework.Position>();
-		for(blatt8.genserver.PositionedAvatar posav : folks)
-			result.put(posav.name, forum.framework.Position.getPosition(posav.position.x, posav.position.y));
-		
-		return result;
-	}
-
 	@Override
 	public void notifyView(blatt8.genserver.PositionedAvatar[] folks) {
 		try {
@@ -35,4 +24,15 @@ public final class CorbaViewReceiver extends CorbaForumViewPOA {
 			e.printStackTrace();
 		}
 	}
+	
+	private Map<String, forum.framework.Position> getMap(
+			blatt8.genserver.PositionedAvatar[] folks) {
+		Map<String, forum.framework.Position> result = new HashMap<String, forum.framework.Position>();
+		for (blatt8.genserver.PositionedAvatar posav : folks)
+			result.put(posav.name, forum.framework.Position.getPosition(
+					posav.position.x, posav.position.y));
+
+		return result;
+	}
+
 }
